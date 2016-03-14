@@ -14,6 +14,8 @@ Change the line "name: 'Example', ip: '192.168.2.1', mac: 'AA:BB:CC:DD:EE:FF'" t
 
 Change the default password (default password is secret).
 
+Put a ssl.crt and ssl.key in /cert folder.
+
 <h1>Run:</h1>
 
 npm start
