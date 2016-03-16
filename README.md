@@ -1,4 +1,4 @@
-﻿<h1>Installation:</h1>
+﻿<h2>Installation:</h2>
 
 git clone https://github.com/tkprocat/node-won-portal.git
 
@@ -6,7 +6,9 @@ cd node-won-portal
 
 npm install
 
-<h1>Configuration:</h1>
+<h2>Configuration:</h2>
+
+Copy config.js.dist to config.js
 
 Open config.js
 
@@ -16,6 +18,6 @@ Change the default password (default password is secret).
 
 Put a ssl.crt and ssl.key in /cert folder.
 
-<h1>Run:</h1>
+<h2>Run:</h2>
 
 npm start

@@ -1,2 +1,4 @@
 /node_modules/
 *.njsproj
+config.js
+/.ntvs_analysis.dat
