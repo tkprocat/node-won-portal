@@ -1,25 +1,42 @@
-var config = require('../config.js');
+"use strict";
+var db = require('./db.js');
 
-exports.findByUsername = function(username, cb) {
-  process.nextTick(function() {
-    for (var i = 0, len = config.users.length; i < len; i++) {
-      var user = config.users[i];
-      if (user.username === username) {
-        return cb(null, user);
-      }
-    }
-    return cb(null, null);
-  });
+exports.findByUsername = function (username, callback) {
+    process.nextTick(function () {
+        db.get('SELECT * FROM users WHERE username = ?', [username], function (err, row) {
+            db.serialize(function () {
+                if (err) {
+                    return callback(err, null);
+                }
+                
+                return callback(null, row);
+            });
+        });
+    });
 };
 
-
-exports.findById = function (id, cb) {
+exports.findById = function (id, callback) {
     process.nextTick(function () {
-        var idx = id - 1;
-        if (config.users[idx]) {
-            cb(null, config.users[idx]);
-        } else {
-            cb(new Error('User ' + id + ' does not exist'));
-        }
+        db.serialize(function () {
+            db.get('SELECT * FROM users WHERE ID = ?', [id], function (err, row) {
+                if (err) {
+                    return callback(err, null);
+                }
+                return callback(null, row);
+            });
+        });
     });
-}
+};
+
+exports.createUser = function (username, password, callback) {
+    process.nextTick(function () {
+        db.serialize(function () {
+            db.run("INSERT INTO users VALUES (?, ?, ?)", [null, username, require('crypto')().createHash('sha256').update(password).digest('hex')], function (err, data) {
+                if (err) {
+                    return callback(err, null);
+                }
+                return callback(null, data);
+            });
+        });
+    });
+};
