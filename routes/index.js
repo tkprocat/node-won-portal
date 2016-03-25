@@ -1,17 +1,15 @@
-﻿"use strict";
-var express = require('express');
+﻿var express = require('express');
 var router = express.Router();
-var passport = require('passport');
-var machines = require('../db/machines');
+var computers = require('../db/computers');
 var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 
 router.get('/', require('connect-ensure-login').ensureLoggedIn(), function (req, res, next) {
-    machines.findAll(function (err, machines) {
+    computers.findAll(function (err, computers) {
         if (err) {
-            console.err('Error getting list of machines from DB.');
+            console.err('Error getting list of computers from DB.');
             return;
         }
-        res.render('index', { machines: machines});
+        res.render('index', { computers: computers});
     });
 });
 

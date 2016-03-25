@@ -1,5 +1,4 @@
-﻿"use strict";
-var crypto = require('crypto');
+﻿var crypto = require('crypto');
 var passport = require('passport');
 var Strategy = require('passport-local').Strategy;
 var db = require('../db');

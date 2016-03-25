@@ -7,19 +7,31 @@ block content
         .panel.panel-default
           .panel-heading
             h1 Status
-          .panel-body
-            ul(id="ping")
+          .panel-body(id="ping")
+            ul
+              li(v-for="result in results" track-by="$index")
+                {{ result }}
 
+    script(src="/js/vue.js")
+    script(src="/js/vue-resource.js")
     script.
-        $(document).ready(function() {
-            ping(); 
-
-            function ping() {
-                $.post( "/ping", {host: "#{host}"}, function( data ) {
-                    $("#ping").append('<li>'+ data.message + '</li>');
-                    if (!data.alive) {
-                        setTimeout(ping(), 5000);
-                    }
-                });
-            }
+        new Vue({
+            el: "#ping",
+            data: {
+                results: []
+            },
+            ready: function () {
+                this.ping('#{host}');
+            },
+            methods: {
+                ping: function (host) {
+                    this.$http.post('/api/ping', {ip: host}).then(function(response) {
+                        this.results.push(response.data.message);
+                        if (!response.data.alive)
+                            this.ping(host);
+                    }, function(error) {
+                        alert(error);
+                    });
+                },
+            },
         });

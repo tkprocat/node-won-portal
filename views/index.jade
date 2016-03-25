@@ -6,15 +6,15 @@ block content
       .col-md-8.col-md-offset-2
         .panel.panel-default
           .panel-heading
-            h1 Wake On LAN
+            h1 Boot computer
           .panel-body
             form(name="won", action="/won" method="post").form-horizontal
               .form-group
-                label.control-label.col-md-2 MAC:
+                label.control-label.col-md-2 Computer:
                 .col-md-8
                     select(name="mac").form-control
-                      each machine, i in machines
-                        option(value="#{machine.mac}") #{machine.name} (#{machine.mac} - #{machine.ip})
+                      each computer, i in computers
+                        option(value="#{computer.mac}") #{computer.name} (#{computer.mac} - #{computer.ip})
 
               .col-md-6.col-md-offset-4
                 input(type="submit", value="Send").btn.btn-primary

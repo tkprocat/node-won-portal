@@ -2,9 +2,28 @@
 html
   head
     title Wake On LAN Portal
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css')
-    script(src="https://code.jquery.com/jquery-2.2.1.min.js")
-    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js')
+    link(rel='stylesheet', href='/css/bootstrap.css')
+    script(src='/js/jquery.js')
+    script(src='/js/bootstrap.js')
   body
-    block content
+    .container
+        nav.navbar.navbar-default
+            .container-fluid
+                .navbar-header
+                    button(type="button", data-toggle="collapse", data-target="#navbar", aria-expanded="false", aria-controls="navbar").navbar-toggle.collapsed
+                        span.sr-only
+                        Toggle navigation
+                        span.icon-bar
+                        span.icon-bar
+                        span.icon-bar
+                    a(href="#").navbar-brand Wake On LAN Portal  
+                #navbar.navbar-collapse.collapse
+                    ul.nav.navbar-nav
+                        li
+                            a(href="/") Home
+                        li
+                            a(href="/users") Users
+                        li
+                            a(href="/computers") Computers
+
+        block content

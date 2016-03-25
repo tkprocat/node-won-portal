@@ -1,10 +1,9 @@
-﻿"use strict";
-var db = require('./db.js');
+﻿var db = require('./db.js');
 
 exports.findAll = function (callback) {
     process.nextTick(function () {
         db.serialize(function () {
-            db.all('SELECT * FROM machines', [], function (err, rows) {
+            db.all('SELECT * FROM computers', [], function (err, rows) {
                 if (err) {
                     return callback(err, null);
                 }
@@ -17,7 +16,7 @@ exports.findAll = function (callback) {
 exports.findByName = function (name, callback) {
     process.nextTick(function () {
         db.serialize(function () {
-            db.get('SELECT * FROM machines WHERE name = ?', [name], function (err, row) {
+            db.get('SELECT * FROM computers WHERE name = ?', [name], function (err, row) {
                 if (err) {
                     return callback(err, null);
                 }
@@ -30,7 +29,7 @@ exports.findByName = function (name, callback) {
 exports.findById = function (id, callback) {
     process.nextTick(function () {
         db.serialize(function () {
-            db.get('SELECT * FROM machines WHERE ID = ?', [id], function (err, row) {
+            db.get('SELECT * FROM computers WHERE ID = ?', [id], function (err, row) {
                 if (err) {
                     return callback(err, null);
                 }
@@ -40,18 +39,22 @@ exports.findById = function (id, callback) {
     });
 };
 
-exports.createMachine = function (name, ip, mac) {
+exports.createComputer = function (name, ip, mac, callback) {
     process.nextTick(function () {
         db.serialize(function () {
-            db.run("INSERT INTO machines VALUES (?, ?, ?)", [null, name, ip, mac]);
+            db.run('INSERT INTO computers VALUES (?, ?, ?, ?)', [null, name, ip, mac], function (err, row) {
+                if (err)
+                    return callback(err, null);
+                return callback(null, row);
+            });
         });
     });
 };
 
-exports.deleteMachine = function (id, callback) {
+exports.deleteComputer = function (id, callback) {
     process.nextTick(function () {
         db.serialize(function () {
-            db.run("DELETE FROM machines WHERE id = ?", [id], function (err, data) {
+            db.run('DELETE FROM computers WHERE id = ?', [id], function (err, data) {
                 if (err) {
                     return callback(err, null);
                 }
@@ -61,10 +64,10 @@ exports.deleteMachine = function (id, callback) {
     });
 };
 
-exports.updateMachine = function (id, name, ip, mac, callback) {
+exports.updateComputer = function (id, name, ip, mac, callback) {
     process.nextTick(function () {
         db.serialize(function () {
-            db.run("UPDATE machines SET name = $name, WHERE id = $id", { $id: id, $name: name, $ip: ip, $mac: mac }, function (err, data) {
+            db.run('UPDATE computers SET name = $name, ip = $ip, mac = $mac WHERE id = $id', { $id: id, $name: name, $ip: ip, $mac: mac }, function (err, data) {
                 if (err) {
                     return callback(err, null);
                 }
