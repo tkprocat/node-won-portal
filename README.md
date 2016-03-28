@@ -1,8 +1,15 @@
-﻿<h2>Installation:</h2>
+﻿<h2>Requirements:</h2>
+Git (for easy deployment, zip file can be used.)
+Sqlite3
+NPM
+
+<h2>Installation:</h2>
 
 git clone https://github.com/tkprocat/node-won-portal.git
 
 cd node-won-portal 
+
+npm install node-pre-gyp -g
 
 npm install
 

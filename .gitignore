@@ -1,4 +1,7 @@
-/node_modules/
+node_modules/
 *.njsproj
 config.js
-/.ntvs_analysis.dat
+.ntvs_analysis.dat
+db/db.sqlite
+bin/*.dll
+obj/*
