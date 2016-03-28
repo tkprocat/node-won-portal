@@ -1,0 +1,167 @@
+﻿extends layout
+
+block content
+  .container.fluid
+    .row
+        .panel.panel-default(id="computers")
+            .panel-heading
+                h1 Computers
+            .panel-body
+                table.table.table-striped
+                    thead
+                        th(style="width: 100px") ID:
+                        th Name:
+                        th IP:
+                        th MAC:
+                        th(style="width: 200px") Action:
+                    tbody                                                      
+                        tr(v-for="computer in computers")
+                            td {{ computer.id }}
+                            td {{ computer.name }}
+                            td {{ computer.ip }}
+                            td {{ computer.mac }}
+                            td 
+                                a.btn.btn-info.btn-sm(href="/ping/{{ computer.ip }}") Ping
+                                button(v-on:click="showUpdateComputerModal(computer)" style="margin: 2px").btn.btn-warning.btn-sm Update
+                                button(v-on:click="deleteComputer(computer)" style="margin: 2px").btn.btn-danger.btn-sm Delete
+                .text-right    
+                    button(data-toggle="modal", data-target="#addComputerModal").btn.btn-primary Add new
+
+    .modal.fade(tabindex="-1", role="dialog", id="addComputerModal")
+      .modal-dialog.modal-lg
+        .modal-content
+          .modal-header
+            .button(type="button", class="close", data-dismiss="modal", aria-label="Close")
+                span(aria-hidden="true") &times;
+            h4(class="modal-title") Add computer
+          .modal-body
+            form(name="addComputer", action="/api/computers" method="post").form-horizontal
+                .form-group
+                    label.control-label.col-md-3 Name:
+                    .col-md-7
+                        input(type="text" name="name" v-model="name" placeholder="Computer name").form-control
+                .form-group
+                    label.control-label.col-md-3 IP:
+                    .col-md-7
+                        input(type="text" name="ip" v-model="ip" placeholder="IP").form-control
+                .form-group
+                    label.control-label.col-md-3 MAC:
+                    .col-md-7
+                        input(type="text" name="mac" v-model="mac" placeholder="MAC").form-control
+
+                .col-md-8.col-md-offset-2.text-danger
+                    ul
+                        li(v-for="error_message in error_messages" track-by="$index")
+                          {{ error_message }}
+                br                                
+
+          .modal-footer
+            .button(type="button", class="btn btn-default", data-dismiss="modal") Close
+            .button(type="button", class="btn btn-primary", v-on:click="addComputer()") Add
+                                   
+    .modal.fade(tabindex="-1", role="dialog", id="updateComputerModal")
+      .modal-dialog.modal-lg
+        .modal-content
+          .modal-header
+            .button(type="button", class="close", data-dismiss="modal", aria-label="Close")
+                span(aria-hidden="true")
+                    &times;
+            h4(class="modal-title") Update computer information
+          .modal-body
+            form(name="updateComputer", action="/api/computer" method="post").form-horizontal
+                .form-group
+                    label.control-label.col-md-3 Name:
+                    .col-md-7
+                        input(type="text" name="name" v-model="name" placeholder="Computer name").form-control
+                .form-group
+                    label.control-label.col-md-3 IP:
+                    .col-md-7
+                        input(type="text" name="ip" v-model="ip" placeholder="IP").form-control
+                .form-group
+                    label.control-label.col-md-3 MAC:
+                    .col-md-7
+                        input(type="text" name="mac" v-model="mac" placeholder="MAC").form-control
+
+                .col-md-8.col-md-offset-2.text-danger
+                    ul
+                        li(v-for="error_message in error_messages" track-by="$index")
+                          {{ error_message }}      
+                br
+          .modal-footer
+            .button(type="button", class="btn btn-default", data-dismiss="modal") Close
+            .button(type="button", class="btn btn-primary", v-on:click="updateComputer()") Update
+
+    script(src="js/vue.js")
+    script(src="js/vue-resource.js")
+    script.
+        new Vue( {
+            el: "body",
+            data: {
+                computers: [],
+                computer_id: 0,
+                name: '',
+                ip: '',
+                mac: '',
+                error_messages: [],
+            },
+            ready: function () {
+                this.getComputers();
+            },
+            methods: {
+                getComputers: function () {
+                    this.$http.get('/api/computers').then(function (response) {
+                       this.computers = response.data;
+                    }, function(response){
+                        alert(response);                        
+                    });
+                },
+                deleteComputers: function(computer) {
+                    this.$http.delete('/api/computers', {id: computer.id}).then(function (response) {
+                        this.getComputers();
+                    }, function(response){
+                        alert(response);                        
+                    });
+                },
+                addComputer: function() {
+                  this.$http.post('/api/computers', {name: this.name, ip: this.ip, mac: this.mac}).then(function (response) {
+                       this.getComputers();
+                       this.name = '';
+                       this.ip = '';
+                       this.mac = '';
+                       this.error_messages = [];
+                       $('#addComputerModal').modal('hide');
+                    }, function(response){
+                        var data = response.data;
+                        this.error_messages = [];
+                        for (var i = 0; i<data.length;i++) {
+                            if (this.error_messages.indexOf(data[i].msg) < 0)
+                                this.error_messages.push(data[i].msg);
+                        }                                                
+                    })
+                },
+                updateComputer: function() {
+                  this.$http.post('/api/computers/'+this.computer_id, {id: this.computer_id, name: this.name, ip: this.ip, mac: this.mac}).then(function (response) {
+                       this.getComputers();
+                       this.name = '';
+                       this.ip = '';
+                       this.mac = '';
+                       $('#updateComputerModal').modal('hide');
+                    }, function(response){
+                        var data = response.data;
+                        this.error_messages = [];
+                        for (var i = 0; i<data.length;i++) {
+                            if (this.error_messages.indexOf(data[i].msg) < 0)
+                                this.error_messages.push(data[i].msg);
+                        }                                                
+                    })
+                },
+                showUpdateComputerModal: function(computer) {
+                    this.computer_id = computer.id;
+                    this.name = computer.name;
+                    this.ip = computer.ip;
+                    this.mac = computer.mac
+                    this.error_messages = '';
+                    $('#updateComputerModal').modal('show');
+                }
+            }
+        });

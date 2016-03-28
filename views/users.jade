@@ -1,0 +1,152 @@
+﻿extends layout
+
+block content
+  .container.fluid
+    .row
+        .panel.panel-default(id="users")
+            .panel-heading
+                h1 Users
+            .panel-body
+                table.table.table-striped
+                    thead
+                        th(style="width: 100px") ID:
+                        th Username:
+                        th(style="width: 150px") Action:
+                    tbody                                                      
+                        tr(v-for="user in users")
+                            td {{ user.id }}
+                            td {{ user.username }}
+                            td 
+                                button(v-on:click="showUpdateUserModal(user)" style="margin: 2px").btn.btn-warning.btn-sm Update
+                                button(v-on:click="deleteUser(user)" style="margin: 2px").btn.btn-danger.btn-sm Delete
+                .text-right    
+                    button(data-toggle="modal", data-target="#addUserModal").btn.btn-primary Add new user
+
+    .modal.fade(tabindex="-1", role="dialog", id="addUserModal")
+      .modal-dialog.modal-lg
+        .modal-content
+          .modal-header
+            .button(type="button", class="close", data-dismiss="modal", aria-label="Close")
+                span(aria-hidden="true") &times;
+            h4(class="modal-title") Create new user
+          .modal-body
+            form(name="addUser", action="/api/users" method="post").form-horizontal
+                .form-group
+                    label.control-label.col-md-3 Username:
+                    .col-md-7
+                        input(type="text" name="username" v-model="username" placeholder="Username").form-control
+                .form-group
+                    label.control-label.col-md-3 Password:
+                    .col-md-7
+                        input(type="password" name="password" v-model="password" placeholder="Password").form-control
+                .form-group
+                    label.control-label.col-md-3 Confirm password:
+                    .col-md-7
+                        input(type="password" name="confirm_password" v-model="confirm_password" placeholder="Confirm password").form-control
+
+                .col-md-8.col-md-offset-2.text-danger
+                    ul
+                        li(v-for="error_message in error_messages" track-by="$index")
+                          {{ error_message }}      
+          .modal-footer
+            .button(type="button", class="btn btn-default", data-dismiss="modal") Close
+            .button(type="button", class="btn btn-primary", v-on:click="addUser()") Create
+                                   
+    .modal.fade(tabindex="-1", role="dialog", id="updateUserModal")
+      .modal-dialog.modal-lg
+        .modal-content
+          .modal-header
+            .button(type="button", class="close", data-dismiss="modal", aria-label="Close")
+                span(aria-hidden="true")
+                    &times;
+            h4(class="modal-title") Update user information
+          .modal-body
+            form(name="updateUser", action="/api/users" method="post").form-horizontal
+                .form-group
+                    label.control-label.col-md-3 Password:
+                    .col-md-7
+                        input(type="password" name="password" v-model="password" placeholder="Password").form-control
+                .form-group
+                    label.control-label.col-md-3 Confirm password:
+                    .col-md-7
+                        input(type="password" name="confirm_password" v-model="confirm_password" placeholder="Confirm password").form-control
+
+                .col-md-8.col-md-offset-2.text-danger
+                    ul
+                        li(v-for="error_message in error_messages" track-by="$index")
+                          {{ error_message }}      
+          .modal-footer
+            .button(type="button", class="btn btn-default", data-dismiss="modal") Close
+            .button(type="button", class="btn btn-primary", v-on:click="updateUser()") Update
+
+    script(src="js/vue.js")
+    script(src="js/vue-resource.js")
+    script.
+        new Vue( {
+            el: "body",
+            data: {
+                users: [],
+                user_id: 0,
+                username: '',
+                password: '',
+                confirm_password: '',
+                error_messages: [],
+            },
+            ready: function () {
+                this.getUsers();
+            },
+            methods: {
+                getUsers: function () {
+                    this.$http.get('/api/users').then(function (response) {
+                       this.users = response.data;
+                    }, function(response){
+                        alert(response);                        
+                    });
+                },
+                deleteUser: function(user) {
+                    this.$http.delete('/api/users', {id: user.id}).then(function (response) {
+                        this.getUsers();
+                    }, function(response){
+                        alert(response);                        
+                    });
+                },
+                addUser: function() {
+                  this.$http.post('/api/users', {username: this.username, password: this.password, confirm_password: this.confirm_password}).then(function (response) {
+                       this.getUsers();
+                       this.username = '';
+                       this.password = '';
+                       this.confirm_password = '';
+                       this.error_messages = [];
+                       $('#addUserModal').modal('hide');
+                    }, function(response){
+                        var data = response.data;
+                        this.error_messages = [];
+                        for (var i = 0; i<data.length;i++) {
+                            if (this.error_messages.indexOf(data[i].msg) < 0)
+                                this.error_messages.push(data[i].msg);
+                        }                                                
+                    })
+                },
+                updateUser: function() {
+                  this.$http.post('/api/users/'+this.user_id, {id: this.user_id, password: this.password, confirm_password: this.confirm_password}).then(function (response) {
+                       this.getUsers();
+                       this.username = '';
+                       this.password = '';
+                       this.confirm_password = '';
+                       this.error_messages = [];
+                       $('#updateUserModal').modal('hide');
+                    }, function(response){
+                        var data = response.data;
+                        this.error_messages = [];
+                        for (var i = 0; i<data.length;i++) {
+                            if (this.error_messages.indexOf(data[i].msg) < 0)
+                                this.error_messages.push(data[i].msg);
+                        }                                                
+                    })
+                },
+                showUpdateUserModal: function(user) {
+                    this.user_id = user.id;
+                    $('#updateUserModal').modal('show');
+                }
+            }
+        });
